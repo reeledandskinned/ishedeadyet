@@ -11,7 +11,7 @@
     "node-fetch": "^3.3.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-scripts": "6.0.0-next.0",
+    "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -21,7 +21,7 @@
     "eject": "react-scripts eject"
   },
   "engines": {
-    "node": "24.x"
+    "node": "22.x"
   },
   "eslintConfig": {
     "extends": [
