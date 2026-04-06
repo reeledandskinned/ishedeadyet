@@ -1,7 +1,7 @@
 // src/App.js
 import React, { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, onValue } from "firebase/database";
+import { getDatabase, ref, onValue } from "firebase/database";
 import trumpImage from "./assets/trump.jpg";
 import "./App.css";
 
@@ -16,19 +16,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Sanitize Firebase keys
-function sanitizeKey(name) {
-  return name.replace(/[.#$\[\]]/g, "_");
-}
-
-// Display name nicely
-function displayName(key) {
-  return key.replace(/_/g, " ");
-}
-
 function App() {
   const [statusMap, setStatusMap] = useState({});
-  const [newName, setNewName] = useState("");
   const prevStatusRef = useRef({});
 
   // Listen for changes in Firebase
@@ -39,7 +28,6 @@ function App() {
     onValue(peopleRef, (snapshot) => {
       const data = snapshot.val() || {};
       const newStatusMap = {};
-      let someoneDead = false;
 
       Object.keys(data).forEach((key) => {
         const alive = Boolean(data[key].alive);
@@ -47,10 +35,6 @@ function App() {
 
         if (!firstLoad && alive === false && prevStatusRef.current[key] !== false) {
           alert("Fat Orange CUNT is DEAD");
-        }
-
-        if (alive === false) {
-          someoneDead = true;
         }
 
         prevStatusRef.current[key] = alive;
@@ -67,16 +51,6 @@ function App() {
     document.title = overallAlive ? "Is he dead yet? Alive" : "Is he dead yet? DEAD";
   }, [statusMap]);
 
-  // Add a new variant
-  const addName = () => {
-    if (!newName) return;
-    const safeName = sanitizeKey(newName);
-    set(ref(db, `people/${safeName}`), { alive: true })
-      .then(() => console.log("Write successful"))
-      .catch((err) => console.error("Write failed:", err));
-    setNewName("");
-  };
-
   const overallAlive = Object.values(statusMap).every((v) => v !== false);
 
   return (
@@ -90,7 +64,7 @@ function App() {
           maxWidth: "80%",
           borderRadius: "12px",
           marginBottom: "1rem",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
+          boxShadow: "0 8px 20px rgba(22, 19, 19, 0.3)",
         }}
       />
       <p
@@ -104,20 +78,6 @@ function App() {
       >
         {overallAlive ? "Alive" : "Fat Orange CUNT is DEAD"}
       </p>
-
-      {/* Input box for adding variants */}
-      <div style={{ marginTop: "2rem" }}>
-        <input
-          type="text"
-          placeholder="Enter name variant"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          style={{ padding: "0.5rem", fontSize: "1rem", width: "250px", marginRight: "0.5rem" }}
-        />
-        <button onClick={addName} style={{ padding: "0.5rem 1rem", fontSize: "1rem" }}>
-          Add Name
-        </button>
-      </div>
     </div>
   );
 }
