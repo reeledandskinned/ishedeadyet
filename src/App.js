@@ -7,23 +7,23 @@ import "./App.css";
 
 // Firebase config
 const firebaseConfig = {
-  apiKey: "89bfe130020545ca03db2f42412e46e9",
+  apiKey: "YOUR_API_KEY_HERE",
   authDomain: "fatorangecunt.firebaseapp.com",
   databaseURL: "https://fatorangecunt-default-rtdb.firebaseio.com/",
   projectId: "fatorangecunt",
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 function App() {
   const [statusMap, setStatusMap] = useState({});
-  const prevStatusRef = useRef({});
+  const prevStatusRef = useRef({}); // Track previous alive/dead status
 
-  // Listen for changes in Firebase
+  // Firebase listener for alive/dead status
   useEffect(() => {
     const peopleRef = ref(db, "people");
-    let firstLoad = true;
 
     onValue(peopleRef, (snapshot) => {
       const data = snapshot.val() || {};
@@ -33,15 +33,15 @@ function App() {
         const alive = Boolean(data[key].alive);
         newStatusMap[key] = alive;
 
-        if (!firstLoad && alive === false && prevStatusRef.current[key] !== false) {
-          alert("Fat Orange CUNT is DEAD");
+        // Alert only when a person changes from alive -> dead
+        if (prevStatusRef.current[key] !== false && alive === false) {
+          alert("Fat Orange CUNT is DEAD!"); // Fires once per death
         }
 
         prevStatusRef.current[key] = alive;
       });
 
       setStatusMap(newStatusMap);
-      firstLoad = false;
     });
   }, []);
 
@@ -68,7 +68,6 @@ function App() {
         }}
       />
       <p
-        className={overallAlive ? "" : "dead-status"}
         style={{
           fontSize: "1.5rem",
           fontWeight: "bold",
